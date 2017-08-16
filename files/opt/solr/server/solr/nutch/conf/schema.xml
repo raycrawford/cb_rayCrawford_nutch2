@@ -1,0 +1,125 @@
+<!--
+=================================================================  
+	Nutch Solr Simple Text Core schema 
+	This xml contains Solr5.2.1 schema definitions for being 
+	able to crawl web pages with Nutch and then post to Solr for 
+	indexing and to access our search functionality.
+	Authors: Apache Foundation, Camilo Tejeiro 
+	License: Apache V2. (Refer to roott dir for all licenses)
+	=================================================================
+-->
+<!--
+
+        Description: This document contains Solr5.2.1 schema definitions 
+        for correct integration with Nutch 1.10 
+-->
+<schema name="nutch" version="1.5">
+<types>
+<!--  The String field types, StrField  -->
+<fieldType name="string" class="solr.StrField" sortMissingLast="true"/>
+<fieldType name="strings" class="solr.StrField" sortMissingLast="true" multiValued="true"/>
+<!--
+ The Boolean field types, BoolField: can take true or false values 
+-->
+<fieldType name="boolean" class="solr.BoolField" sortMissingLast="true"/>
+<fieldType name="booleans" class="solr.BoolField" sortMissingLast="true" multiValued="true"/>
+<!--  Default numeric field types.  -->
+<!--
+ For faster range queries, consider the tint/tfloat/tlong/tdouble types
+-->
+<!--  Integer field types, TrieIntField class -->
+<fieldType name="int" class="solr.TrieIntField" precisionStep="0" positionIncrementGap="0"/>
+<fieldType name="ints" class="solr.TrieIntField" precisionStep="0" positionIncrementGap="0" multiValued="true"/>
+<fieldType name="tint" class="solr.TrieIntField" precisionStep="8" positionIncrementGap="0"/>
+<fieldType name="tints" class="solr.TrieIntField" precisionStep="8" positionIncrementGap="0" multiValued="true"/>
+<!--  Long field types, TrieLongField class -->
+<fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
+<fieldType name="longs" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0" multiValued="true"/>
+<fieldType name="tlong" class="solr.TrieLongField" precisionStep="8" positionIncrementGap="0"/>
+<fieldType name="tlongs" class="solr.TrieLongField" precisionStep="8" positionIncrementGap="0" multiValued="true"/>
+<!--  Floating point field types, TrieFloatField class -->
+<fieldType name="float" class="solr.TrieFloatField" precisionStep="0" positionIncrementGap="0"/>
+<fieldType name="floats" class="solr.TrieFloatField" precisionStep="0" positionIncrementGap="0" multiValued="true"/>
+<fieldType name="tfloat" class="solr.TrieFloatField" precisionStep="8" positionIncrementGap="0"/>
+<fieldType name="tfloats" class="solr.TrieFloatField" precisionStep="8" positionIncrementGap="0" multiValued="true"/>
+<!--  Double field types, TrieFloatField class -->
+<fieldType name="double" class="solr.TrieDoubleField" precisionStep="0" positionIncrementGap="0"/>
+<fieldType name="doubles" class="solr.TrieDoubleField" precisionStep="0" positionIncrementGap="0" multiValued="true"/>
+<fieldType name="tdouble" class="solr.TrieDoubleField" precisionStep="8" positionIncrementGap="0"/>
+<fieldType name="tdoubles" class="solr.TrieDoubleField" precisionStep="8" positionIncrementGap="0" multiValued="true"/>
+<!--  Date field types,  TrieDateField class  -->
+<fieldType name="date" class="solr.TrieDateField" precisionStep="0" positionIncrementGap="0"/>
+<fieldType name="dates" class="solr.TrieDateField" precisionStep="0" positionIncrementGap="0" multiValued="true"/>
+<fieldType name="tdate" class="solr.TrieDateField" precisionStep="6" positionIncrementGap="0"/>
+<fieldType name="tdates" class="solr.TrieDateField" precisionStep="6" positionIncrementGap="0" multiValued="true"/>
+<!--
+ General text field that has reasonable, generic cross-language defaults 
+				This field type will be used to process general aggregated 
+				english text to be easily searchable, "text enabled for search" 
+-->
+<fieldType name="text_en_search" class="solr.TextField" positionIncrementGap="100" multiValued="true">
+<!--  Analyzer properties at index time  -->
+<analyzer type="index">
+<!--
+ break words appart (tokenizes) with  with StandardTokenizer 
+-->
+<tokenizer class="solr.StandardTokenizerFactory"/>
+<!--  filter out stop words  -->
+<filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>
+<!--  filter to ignore cases  -->
+<filter class="solr.LowerCaseFilterFactory"/>
+</analyzer>
+<!--  Analyzer properties at query "search" time  -->
+<analyzer type="query">
+<!--
+ break search key words appart (tokenizes) with with StandardTokenizer 
+-->
+<tokenizer class="solr.StandardTokenizerFactory"/>
+<!--  filter out stop words  -->
+<filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>
+<!--  filter to ignore cases  -->
+<filter class="solr.LowerCaseFilterFactory"/>
+</analyzer>
+</fieldType>
+<fieldType name="url" class="solr.TextField" positionIncrementGap="100">
+<analyzer>
+<tokenizer class="solr.StandardTokenizerFactory"/>
+<filter class="solr.LowerCaseFilterFactory"/>
+<filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1"/>
+</analyzer>
+</fieldType>
+<fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coordinate"/>
+</types>
+<!--  Field Names Definitions  -->
+<fields>
+<!--  Solr Recommended/Required Fields  -->
+<field name="id" type="string" stored="true" indexed="true" required="true"/>
+<field name="_version_" type="long" stored="true" indexed="true"/>
+<!--
+ Field name which we use to hold all our aggregated fields that will be 
+				searchable 
+-->
+<field name="default_search_field" type="text_en_search" stored="false" indexed="true" multiValued="true"/>
+<!--  Nutch core fields  -->
+<field name="segment" type="string" stored="true" indexed="false"/>
+<field name="boost" type="float" stored="true" indexed="false"/>
+<field name="digest" type="string" stored="false" indexed="false"/>
+<!--  Nutch fields for index-basic plugin  -->
+<field name="host" type="string" stored="true" indexed="false"/>
+<field name="title" type="string" stored="true" indexed="true"/>
+<field name="url" type="url" stored="false" indexed="true"/>
+<field name="content" type="string" stored="false" indexed="true" multiValued="true"/>
+<field name="tstamp" type="date" stored="false" indexed="false"/>
+<!-- RAC -->
+<field name="auctionLocation" type="string" stored="true" indexed="true">
+</fields>
+<!--
+ Field to use to determine and enforce document uniqueness. 
+-->
+<uniqueKey>id</uniqueKey>
+<!--
+ copy all of our indexed fields into our aggregated default 
+			search field  
+-->
+<copyField source="*" dest="default_search_field"/>
+</schema>

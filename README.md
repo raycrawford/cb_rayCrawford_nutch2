@@ -1,4 +1,5 @@
 # cb_rayCrawford_nutch2
 
-TODO: Enter the cookbook description here.
+hbase web UI: http://192.168.56.6:60010
+See: http://hbase.apache.org/book.html#quickstart
 
